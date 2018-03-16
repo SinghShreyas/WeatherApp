@@ -10,11 +10,13 @@ import Foundation
 
 
 class Weather {
+    
+    // Data that are required to be displayed on the View
     let description:String
     let icon:String
-    let date:Double
+    let date:Int
     
-    init(description : String, icon : String, date:Double) {
+    init(description : String, icon : String, date:Int) {
         self.description = description
         self.icon = icon
         self.date = date

@@ -9,173 +9,155 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import SDWebImage
+import SVProgressHUD
 
-class CityWeatherTableViewController: UITableViewController {
+class CityWeatherTableViewController: UITableViewController, sendCityIdDelegate{
     
+  
     var weatherData = [Weather]()
     
-    var description1 = [String]()
+    var navigationTitle = String()
+    
+    var cityId = String()
+    var weatherUrl =  String()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        FetchWeather()
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
-            // Put your code which should be executed with a delay here
-           print(self.weatherData[2].icon)
-            print(self.weatherData.count)
-           self.tableView.reloadData()
-            
-        })
+        SVProgressHUD.showInfo(withStatus: "Loading...")
         
+        self.title = navigationTitle
+        //print(navigationTitle)
+        //print(cityId)
+        tableView.rowHeight = 50
+        tableView.rowHeight = UITableViewAutomaticDimension
+        
+        // Add a background view to the table view
+        let backgroundImage = UIImage(named: "background.png")
+        let imageView = UIImageView(image: backgroundImage)
+        self.tableView.backgroundView = imageView
+        
+        self.tableView.register(UINib(nibName: "WeatherTableViewCell", bundle: nil), forCellReuseIdentifier: "WeatherCell1")
+       
+        self.weatherUrl = "https://api.openweathermap.org/data/2.5/forecast/daily?id=" + cityId + "&cnt=16&APPID=cb9fe4c528e41a6c8e40c1abb6183e8c"
+        
+        FetchWeather(url: weatherUrl)
+        print(weatherUrl)
+        
+    }
+    func userSelectedCity(cityId: String) {
+        self.cityId = cityId
+    }
+    func userSelectedCityName(cityName: String) {
+        self.navigationTitle = cityName
     }
     
     
-
+    override func viewWillAppear(_ animated: Bool) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+            self.tableView.reloadData()
+            SVProgressHUD.dismiss()
+        })
+    }
+    
+    
     // MARK: - Table view data source
 
-//    override func numberOfSections(in tableView: UITableView) -> Int {
-//        // #warning Incomplete implementation, return the number of sections
-//        return 0
-//    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
+        
         return weatherData.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "weatherCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell1", for: indexPath) as! WeatherTableViewCell
         
         let weatherObject = weatherData[indexPath.row]
         
-        cell.textLabel?.text = weatherObject.description
-        cell.detailTextLabel?.text = String(weatherObject.date)
+        cell.date.text =  getDate(epochTime: weatherObject.date)
+        cell.weatherDescription.text = weatherObject.description.capitalized
         
-        let iconUrl = "https://openweathermap.org/img/w/" + weatherObject.icon + ".png"
-        let catPictureURL = URL(string: iconUrl)
-      
-        // Creating a session object with the default configuration.
-        // You can read more about it here https://developer.apple.com/reference/foundation/urlsessionconfiguration
-        let session = URLSession(configuration: .default)
+        let iconUrlString  = "https://openweathermap.org/img/w/" + weatherObject.icon + ".png"
+        let iconUrl = URL(string: iconUrlString)
+        cell.icon?.sd_setImage(with: iconUrl)
         
-        // Define a download task. The download task will download the contents of the URL as a Data object and then you can do what you wish with that data.
-        session.dataTask(with: catPictureURL!) { (data, response, error) in
-            // The download has finished.
-            if let e = error {
-                print("Error downloading cat picture: \(e)")
-            } else {
-                // No errors found.
-                // It would be weird if we didn't have a response, so check for that too.
-                if let res = response as? HTTPURLResponse {
-                    print("Downloaded cat picture with response code \(res.statusCode)")
-                    if let imageData = data {
-                        // Finally convert that Data into an image and do what you wish with it.
-                        
-                        // Do something with your image.
-                        cell.imageView?.image = UIImage(data: imageData)
-                        
-                    } else {
-                        print("Couldn't get image: Image is nil")
-                    }
-                } else {
-                    print("Couldn't get response code for some reason")
-                }
-            }
-            }.resume()
         
+//        cell.textLabel?.text = weatherObject.description
+//        cell.detailTextLabel?.text = getDate(epochTime: weatherObject.date)
+//        let session = URLSession(configuration: .default)
+//
+//        session.dataTask(with: iconUrl!) { (data, response, error) in
+//            // The download has finished.
+//            if let e = error {
+//                print("Error downloading cat picture: \(e)")
+//            } else {
+//                // No errors found. Response check
+//                if let res = response as? HTTPURLResponse {
+//                    print("Icon Downloaded,response code: \(res.statusCode)")
+//                    if let imageData = data {
+//                       //Icon is set on the row of tableView
+//                        cell.imageView?.image = UIImage(data: imageData)
+//
+//                    } else {
+//                        print("Couldn't get icon: icon is nil")
+//                    }
+//                } else {
+//                    print("Couldn't get response code for some reason")
+//                }
+//            }
+//            }.resume()
+        cell.selectionStyle = UITableViewCellSelectionStyle.none
         
         return cell
     }
  
+    
     //This will fetch data from API.
-    func FetchWeather(){
-        Alamofire.request("https://api.openweathermap.org/data/2.5/forecast/daily?id=1275004&cnt=16&APPID=cb9fe4c528e41a6c8e40c1abb6183e8c")
-            .responseJSON { response in
-                guard response.result.isSuccess else {
-                    print("Error while fetching tags: \(String(describing: response.result.error))")
-                    //  completion([String]())
-                    return
-                }
-                
-                guard let responseJSON = response.result.value as? [String: Any] else {
-                    print("Invalid tag information received from the service")
-                    //completion([String]())
+    func FetchWeather(url: String){
+            print(url)
+            Alamofire.request(url)
+                .responseJSON { response in
+                    guard response.result.isSuccess else {
+                        print("Error while fetching data: \(String(describing: response.result.error))")
+                        return
+                    }
                     
-                    return
-                }
-                
-              //  print(responseJSON)
-                
-                let json = JSON(responseJSON)
-              
-               // print(json)
-                
-                for item in json["list"].arrayValue {
-                    print(item["weather"][0]["description"].stringValue)
-                    print(item["weather"][0]["icon"].stringValue)
-                    print(item["dt"].doubleValue)
+                    guard let responseJSON = response.result.value as? [String: Any] else {
+                        print("Invalid Information.")
+                        return
+                    }
                     
-                    let item = Weather(description: item["weather"][0]["description"].stringValue , icon: item["weather"][0]["icon"].stringValue, date: item["dt"].doubleValue)
-                    self.weatherData.append(item)
+                  //  print(responseJSON)
                     
-                  //  self.description1.append(item["weather"][0]["description"].stringValue)
+                    let json = JSON(responseJSON)
+                  
+                   // print(json)
+                    
+                    // Set data in Weather Object
+                    for item in json["list"].arrayValue {
+                       // print(item["weather"][0]["description"].stringValue)
+                       // print(item["weather"][0]["icon"].stringValue)
+                       // print(item["dt"].doubleValue)
+                        
+                        let item = Weather(description: item["weather"][0]["description"].stringValue , icon: item["weather"][0]["icon"].stringValue, date: item["dt"].intValue)
+                        self.weatherData.append(item)
+                        
+                    }
                 }
+      
         }
-    }
     
-//    func getDataFromUrl(url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
-//        URLSession.shared.dataTask(with: url) { data, response, error in
-//            completion(data, response, error)
-//            }.resume()
-//    }
-//
-//    func downloadImage(url: URL) {
-//        print("Download Started")
-//        getDataFromUrl(url: url) { data, response, error in
-//            guard let data = data, error == nil else { return }
-//            print(response?.suggestedFilename ?? url.lastPathComponent)
-//            print("Download Finished")
-//            DispatchQueue.main.async() {
-//                cell.imageView?.image = UIImage(data: data)
-//            }
-//        }
-//    }
-    
-    func downloadImage(url: String) -> UIImage {
-        let catPictureURL = URL(string: url)!
-        var image: UIImage?
-    // Creating a session object with the default configuration.
-    // You can read more about it here https://developer.apple.com/reference/foundation/urlsessionconfiguration
-    let session = URLSession(configuration: .default)
-    
-    // Define a download task. The download task will download the contents of the URL as a Data object and then you can do what you wish with that data.
-        let  downloadPicTask = session.dataTask(with: catPictureURL) { (data, response, error) in
-        // The download has finished.
-        if let e = error {
-            print("Error downloading cat picture: \(e)")
-        } else {
-            // No errors found.
-            // It would be weird if we didn't have a response, so check for that too.
-            if let res = response as? HTTPURLResponse {
-                print("Downloaded cat picture with response code \(res.statusCode)")
-                if let imageData = data {
-                    // Finally convert that Data into an image and do what you wish with it.
-                      image = UIImage(data: imageData)
-                    // Do something with your image.
-                    
-                } else {
-                    print("Couldn't get image: Image is nil")
+                 func getDate(epochTime: Int) -> String {
+                        if epochTime == 0 {return ""}
+                        let date = NSDate(timeIntervalSince1970: TimeInterval(epochTime))
+                        let dayTimePeriodFormatter = DateFormatter()
+                        dayTimePeriodFormatter.dateFormat = "dd/MM/YYYY"
+                        let dateString = dayTimePeriodFormatter.string(from: date as Date)
+                        return dateString
                 }
-            } else {
-                print("Couldn't get response code for some reason")
-            }
-        }
-    }.resume()
-      return image!
-    }
     
-  //  self.downloadPicTask.resume()
 
+    
 }

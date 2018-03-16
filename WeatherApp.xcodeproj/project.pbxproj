@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02375889205AF634006C7129 /* WeatherTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02375887205AF634006C7129 /* WeatherTableViewCell.swift */; };
+		0237588A205AF634006C7129 /* WeatherTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02375888205AF634006C7129 /* WeatherTableViewCell.xib */; };
+		02F011C8205A685900737A9A /* CityNameTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02F011C7205A685900737A9A /* CityNameTableViewController.swift */; };
 		02FCBC0F2059A357001F2DF9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FCBC0E2059A357001F2DF9 /* AppDelegate.swift */; };
 		02FCBC142059A358001F2DF9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02FCBC122059A358001F2DF9 /* Main.storyboard */; };
 		02FCBC162059A358001F2DF9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 02FCBC152059A358001F2DF9 /* Assets.xcassets */; };
@@ -17,6 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		02375887205AF634006C7129 /* WeatherTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherTableViewCell.swift; sourceTree = "<group>"; };
+		02375888205AF634006C7129 /* WeatherTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WeatherTableViewCell.xib; sourceTree = "<group>"; };
+		02F011C7205A685900737A9A /* CityNameTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityNameTableViewController.swift; sourceTree = "<group>"; };
 		02FCBC0B2059A357001F2DF9 /* WeatherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		02FCBC0E2059A357001F2DF9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		02FCBC132059A358001F2DF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -94,6 +100,9 @@
 			children = (
 				02FCBC0E2059A357001F2DF9 /* AppDelegate.swift */,
 				02FCBC252059A850001F2DF9 /* CityWeatherTableViewController.swift */,
+				02F011C7205A685900737A9A /* CityNameTableViewController.swift */,
+				02375887205AF634006C7129 /* WeatherTableViewCell.swift */,
+				02375888205AF634006C7129 /* WeatherTableViewCell.xib */,
 			);
 			name = Controller;
 			path = "New Group";
@@ -178,6 +187,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0237588A205AF634006C7129 /* WeatherTableViewCell.xib in Resources */,
 				02FCBC192059A358001F2DF9 /* LaunchScreen.storyboard in Resources */,
 				02FCBC162059A358001F2DF9 /* Assets.xcassets in Resources */,
 				02FCBC142059A358001F2DF9 /* Main.storyboard in Resources */,
@@ -213,11 +223,15 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-WeatherApp/Pods-WeatherApp-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -247,9 +261,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02375889205AF634006C7129 /* WeatherTableViewCell.swift in Sources */,
 				02FCBC0F2059A357001F2DF9 /* AppDelegate.swift in Sources */,
 				02FCBC282059B41E001F2DF9 /* Weather.swift in Sources */,
 				02FCBC262059A850001F2DF9 /* CityWeatherTableViewController.swift in Sources */,
+				02F011C8205A685900737A9A /* CityNameTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
